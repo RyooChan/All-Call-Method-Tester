@@ -2,30 +2,34 @@ package spring.methodtester
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiMethod
-import com.intellij.util.Query
+import com.intellij.openapi.ui.Messages
 import com.intellij.execution.junit.JUnitConfiguration
 import com.intellij.execution.junit.JUnitConfigurationType
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder
-import com.intellij.execution.impl.RunManagerImpl
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.execution.ProgramRunnerUtil
 import com.intellij.execution.RunManager
-import com.intellij.execution.configurations.ConfigurationFactory
-import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.psi.PsiReference
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.search.searches.MethodReferencesSearch
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
-import com.jetbrains.rd.util.qualifiedName
 
 object TestRunnerUtil {
 
     fun runRelatedTests(method: PsiMethod) {
         val project = method.project
         val relatedTests = findAllRelatedTests(method)
+
+        if (relatedTests.isEmpty()) {
+            Messages.showMessageDialog(
+                project,
+                "No related tests found for this method.",
+                "Information",
+                Messages.getInformationIcon()
+            )
+            return
+        }
 
         runMultipleTests(project, relatedTests)
     }
