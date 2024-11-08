@@ -14,8 +14,8 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-        메서드가 사용된 테스트 케이스를 한꺼번에 테스트할 수 있습니다.
-        원하는 메서드 위에서 마우스 오른쪽 버튼을 누르고 Run Related Tests 를 클릭하면 됩니다.
+        You can test all the test cases where a method is used at once.
+        Right-click on the desired method and select "Run Related Tests."
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.
