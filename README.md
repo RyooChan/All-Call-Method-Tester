@@ -12,7 +12,7 @@ Improves Code Reliability: Ensures that changes do not inadvertently affect othe
 
 ## How To Use:
 
-1. Download the zip file.
+1. Download the [zip file](https://github.com/RyooChan/All-Call-Method-Tester/releases/tag/v1.0.0).
 2. In IntelliJ, go to Preferences and click on Plugins, then click the gear icon.
 3. Select "Install Plugin from Disk."
 4. Choose the downloaded file.
