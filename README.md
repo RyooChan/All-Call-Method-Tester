@@ -16,9 +16,11 @@ Improves Code Reliability: Ensures that changes do not inadvertently affect othe
 2. In IntelliJ, go to Preferences and click on Plugins, then click the gear icon.
 3. Select "Install Plugin from Disk."
 <img width="719" alt="image" src="https://github.com/user-attachments/assets/c86c9c47-b67a-4226-9b56-2390ab7510a5">
+
 5. Choose the downloaded file.
 6. Restart IntelliJ.
 7. Right-click on the method you want to test and select "Run Related Tests."
 <img width="596" alt="image" src="https://github.com/user-attachments/assets/0f1d5a76-14ac-4700-8bdf-d3f4b7a31fc5">
+
 8. Testing is complete.
 <img width="594" alt="image" src="https://github.com/user-attachments/assets/354fa71f-1b2b-448c-a13c-21ec12183bf9">
