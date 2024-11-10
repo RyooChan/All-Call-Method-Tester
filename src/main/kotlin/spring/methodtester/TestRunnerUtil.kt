@@ -108,6 +108,9 @@ object TestRunnerUtil {
     }
 
     private fun isTestAnnotated(method: PsiMethod): Boolean {
-        return method.annotations.any { it.qualifiedName == "org.junit.jupiter.api.Test" }
+        return method.annotations.any {
+            it.qualifiedName == "org.junit.jupiter.api.Test" ||
+                    it.qualifiedName == "org.junit.Test"
+        }
     }
 }
