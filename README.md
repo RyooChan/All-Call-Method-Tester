@@ -24,3 +24,12 @@ Improves Code Reliability: Ensures that changes do not inadvertently affect othe
 
 8. Testing is complete.
 <img width="594" alt="image" src="https://github.com/user-attachments/assets/354fa71f-1b2b-448c-a13c-21ec12183bf9">
+
+## For:
+
+- Junit4, Junit5 both
+- Java
+
+## TODO 
+
+- For Kotlin (There is an issue in Kotlin code where all methods in the same class are targeted for testing)
