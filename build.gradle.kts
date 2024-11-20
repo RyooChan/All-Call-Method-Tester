@@ -50,6 +50,10 @@ tasks {
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
+
+    patchPluginXml {
+        sinceBuild.set("211")
+    }
 }
 
 sourceSets {
