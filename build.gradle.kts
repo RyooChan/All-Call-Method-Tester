@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "spring"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -34,11 +34,6 @@ tasks {
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
-    }
-
-    patchPluginXml {
-        sinceBuild.set("231")
-        untilBuild.set("241.*")
     }
 
     signPlugin {
