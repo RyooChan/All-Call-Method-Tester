@@ -16,6 +16,11 @@
     <description><![CDATA[
         You can test all the test cases where a method is used at once.
         Right-click on the desired method and select "Run Related Tests."
+
+        You can also test all the test cases for a class and its methods at once.
+        Right-click on the desired class and select "Run Related Tests."
+
+        This ensures that all relevant tests for the class and its methods, including dependencies, are executed, providing comprehensive validation and safer refactoring.
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.
