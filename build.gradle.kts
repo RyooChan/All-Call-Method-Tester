@@ -1,10 +1,11 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.9.21"
-    id("org.jetbrains.intellij") version "1.16.1"
+    id("java")
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
+    id("org.jetbrains.intellij") version "1.17.4"
 }
 
 group = "spring"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -13,10 +14,14 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.1.5")
-    type.set("IC") // Target IDE Platform
+    version.set("2024.1")
+    type.set("IC")
 
     plugins.set(listOf("JUnit", "org.jetbrains.kotlin", "java",))
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {
@@ -33,12 +38,10 @@ tasks {
         targetCompatibility = "17"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
-
-    patchPluginXml {
-        sinceBuild.set("231")
-        untilBuild.set("241.*")
+        kotlinOptions {
+            jvmTarget = "17"
+            languageVersion = "1.9"
+        }
     }
 
     signPlugin {
@@ -49,6 +52,11 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+    }
+
+    patchPluginXml {
+        sinceBuild.set("211")
+        untilBuild.set("")
     }
 }
 

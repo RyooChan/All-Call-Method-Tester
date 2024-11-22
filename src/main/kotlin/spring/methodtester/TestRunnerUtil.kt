@@ -11,6 +11,7 @@ import com.intellij.execution.ProgramRunnerUtil
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.openapi.module.ModuleUtil
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
@@ -80,11 +81,7 @@ object TestRunnerUtil {
         }
 
         val updatedVisited = visitedMethods + method
-        val currentMethodTests = if (isTestAnnotated(method)) {
-            setOf(method)
-        } else {
-            emptySet()
-        }
+        val currentMethodTests = if (isTestAnnotated(method)) setOf(method) else emptySet()
 
         val references = ReferencesSearch.search(method).findAll()
 
@@ -108,9 +105,27 @@ object TestRunnerUtil {
     }
 
     private fun isTestAnnotated(method: PsiMethod): Boolean {
-        return method.annotations.any {
-            it.qualifiedName == "org.junit.jupiter.api.Test" ||
-                    it.qualifiedName == "org.junit.Test"
+        return method.hasAnnotation("org.junit.jupiter.api.Test") ||
+                method.hasAnnotation("org.junit.Test")
+    }
+
+    fun runTestsForAllMethodsInClass(psiClass: PsiClass) {
+        val project = psiClass.project
+        val allMethods = psiClass.methods.toSet()
+        val allRelatedTests = allMethods.flatMap { method ->
+            findAllRelatedTests(method)
+        }.toSet()
+
+        if (allRelatedTests.isEmpty()) {
+            Messages.showMessageDialog(
+                project,
+                "No related tests found for methods in this class.",
+                "Information",
+                Messages.getInformationIcon()
+            )
+            return
         }
+
+        runMultipleTests(project, allRelatedTests)
     }
 }

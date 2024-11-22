@@ -10,13 +10,6 @@ Integration with Testing Frameworks: Built to integrate seamlessly with popular 
 
 Improves Code Reliability: Ensures that changes do not inadvertently affect other parts of the application, thus increasing the reliability and stability of the code.
 
-## Marketplace:
-
-https://plugins.jetbrains.com/plugin/25797-all-call-method-tester/edit/versions/stable/631371
-
-You can search for and download the plugin via the marketplace.
-Try searching with keywords such as method, test, etc.
-
 ## How To Use:
 
 1. Download the [zip file](https://github.com/RyooChan/All-Call-Method-Tester/releases/tag/v1.0.0).
