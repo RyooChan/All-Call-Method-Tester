@@ -28,8 +28,4 @@ Improves Code Reliability: Ensures that changes do not inadvertently affect othe
 ## For:
 
 - Junit4, Junit5 both
-- Java
-
-## TODO 
-
-- For Kotlin (There is an issue in Kotlin code where all methods in the same class are targeted for testing)
+- Java, Kotlin
