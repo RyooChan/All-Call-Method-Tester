@@ -1,3 +1,5 @@
+## [MarketPlace](https://plugins.jetbrains.com/plugin/25797-all-call-method-tester)
+
 ## Features:
 
 Method Usage Identification: The plugin scans the entire codebase to locate all occurrences of the target method, mapping out its usage across different modules and classes.
