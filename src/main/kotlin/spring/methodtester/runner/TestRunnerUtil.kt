@@ -1,6 +1,8 @@
-package spring.methodtester
+package spring.methodtester.runner
 
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.openapi.ui.Messages
 import com.intellij.execution.junit.JUnitConfiguration
@@ -11,16 +13,20 @@ import com.intellij.execution.ProgramRunnerUtil
 import com.intellij.execution.RunManager
 import com.intellij.execution.configurations.ConfigurationTypeUtil
 import com.intellij.openapi.module.ModuleUtil
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTreeUtil
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtFunction
+import spring.methodtester.model.JavaTestableMethod
+import spring.methodtester.model.KotlinTestableMethod
+import spring.methodtester.model.TestableMethod
 
 object TestRunnerUtil {
 
-    fun runRelatedTests(method: PsiMethod) {
-        val project = method.project
-        val relatedTests = findAllRelatedTests(method)
+    fun runRelatedTests(methodElement: PsiElement) {
+        val project = methodElement.project
+        val relatedTests = findAllRelatedTests(methodElement)
 
         if (relatedTests.isEmpty()) {
             Messages.showMessageDialog(
@@ -35,7 +41,32 @@ object TestRunnerUtil {
         runMultipleTests(project, relatedTests)
     }
 
-    private fun runMultipleTests(project: Project, testMethods: Set<PsiMethod>) {
+    fun runTestsForAllMethodsInClass(classElement: PsiElement) {
+        val project = classElement.project
+        val allMethods = when (classElement) {
+            is PsiClass -> classElement.methods.map { JavaTestableMethod(it) }
+            is KtClass -> classElement.declarations.filterIsInstance<KtFunction>().map { KotlinTestableMethod(it) }
+            else -> emptyList()
+        }.toSet()
+
+        val allRelatedTests = allMethods.flatMap { method ->
+            findAllRelatedTests(method)
+        }.toSet()
+
+        if (allRelatedTests.isEmpty()) {
+            Messages.showMessageDialog(
+                project,
+                "No related tests found for methods in this class.",
+                "Information",
+                Messages.getInformationIcon()
+            )
+            return
+        }
+
+        runMultipleTests(project, allRelatedTests)
+    }
+
+    private fun runMultipleTests(project: Project, testMethods: Set<TestableMethod>) {
         val runManager = RunManager.getInstance(project)
         val junitConfigurationType = ConfigurationTypeUtil.findConfigurationType(JUnitConfigurationType::class.java)
         val configurationFactory = junitConfigurationType.configurationFactories.firstOrNull()
@@ -46,14 +77,14 @@ object TestRunnerUtil {
         val data = configuration.persistentData
 
         val module = testMethods.firstOrNull()?.let {
-            ModuleUtil.findModuleForPsiElement(it)
+            ModuleUtil.findModuleForPsiElement(it.psiElement)
         } ?: throw IllegalStateException("Cannot find module for test methods")
 
         configuration.setModule(module)
 
         val methodPatterns = testMethods.mapNotNull { method ->
-            val className = method.containingClass?.qualifiedName ?: return@mapNotNull null
-            "$className,${method.name}"
+            method.containingClassQualifiedName ?: return@mapNotNull null
+            "${method.containingClassQualifiedName},${method.name}"
         }.toCollection(LinkedHashSet())
 
         data.apply {
@@ -72,18 +103,41 @@ object TestRunnerUtil {
         ProgramRunnerUtil.executeConfiguration(environment, false, true)
     }
 
+    private fun findAllRelatedTests(element: PsiElement, visitedMethods: Set<TestableMethod> = emptySet()): Set<TestableMethod> {
+        val testMethods = mutableSetOf<TestableMethod>()
+
+        when (element) {
+            is PsiMethod -> {
+                testMethods.add(JavaTestableMethod(element))
+            }
+            is KtFunction -> {
+                testMethods.add(KotlinTestableMethod(element))
+            }
+        }
+
+        val relatedTests = testMethods.flatMap { method ->
+            findAllRelatedTests(method, visitedMethods)
+        }.toSet()
+
+        return relatedTests
+    }
+
     private fun findAllRelatedTests(
-        method: PsiMethod,
-        visitedMethods: Set<PsiMethod> = emptySet()
-    ): Set<PsiMethod> {
+        method: TestableMethod,
+        visitedMethods: Set<TestableMethod> = emptySet()
+    ): Set<TestableMethod> {
         if (method in visitedMethods) {
             return emptySet()
         }
 
         val updatedVisited = visitedMethods + method
-        val currentMethodTests = if (isTestAnnotated(method)) setOf(method) else emptySet()
+        val currentMethodTests = if (method.isTestAnnotated() || method.isNestedTestClass()) {
+            setOf(method)
+        } else {
+            emptySet()
+        }
 
-        val references = ReferencesSearch.search(method).findAll()
+        val references: Collection<PsiReference> = ReferencesSearch.search(method.psiElement).findAll()
 
         val referencedTests = references
             .mapNotNull { reference ->
@@ -97,35 +151,17 @@ object TestRunnerUtil {
         return currentMethodTests + referencedTests
     }
 
-    private fun findEnclosingMethod(reference: PsiReference): PsiMethod? {
+    private fun findEnclosingMethod(reference: PsiReference): TestableMethod? {
         val element = reference.element
 
         val enclosingMethod = PsiTreeUtil.getParentOfType(element, PsiMethod::class.java)
-        return enclosingMethod
-    }
+            ?: PsiTreeUtil.getParentOfType(element, KtFunction::class.java)
+            ?: return null
 
-    private fun isTestAnnotated(method: PsiMethod): Boolean {
-        return method.hasAnnotation("org.junit.jupiter.api.Test") ||
-                method.hasAnnotation("org.junit.Test")
-    }
-
-    fun runTestsForAllMethodsInClass(psiClass: PsiClass) {
-        val project = psiClass.project
-        val allMethods = psiClass.methods.toSet()
-        val allRelatedTests = allMethods.flatMap { method ->
-            findAllRelatedTests(method)
-        }.toSet()
-
-        if (allRelatedTests.isEmpty()) {
-            Messages.showMessageDialog(
-                project,
-                "No related tests found for methods in this class.",
-                "Information",
-                Messages.getInformationIcon()
-            )
-            return
+        return when (enclosingMethod) {
+            is PsiMethod -> JavaTestableMethod(enclosingMethod)
+            is KtFunction -> KotlinTestableMethod(enclosingMethod)
+            else -> null
         }
-
-        runMultipleTests(project, allRelatedTests)
     }
 }

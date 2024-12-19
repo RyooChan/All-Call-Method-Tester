@@ -7,6 +7,9 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
+import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtNamedFunction
+import spring.methodtester.runner.TestRunnerUtil
 
 class RunRelatedTestsAction : AnAction() {
 
@@ -19,6 +22,12 @@ class RunRelatedTestsAction : AnAction() {
                 TestRunnerUtil.runRelatedTests(psiElement)
             }
             is PsiClass -> {
+                TestRunnerUtil.runTestsForAllMethodsInClass(psiElement)
+            }
+            is KtNamedFunction -> {
+                TestRunnerUtil.runRelatedTests(psiElement)
+            }
+            is KtClass -> {
                 TestRunnerUtil.runTestsForAllMethodsInClass(psiElement)
             }
             else -> {
@@ -40,7 +49,8 @@ class RunRelatedTestsAction : AnAction() {
             return
         }
 
-        e.presentation.isEnabledAndVisible = (psiElement is PsiMethod || psiElement is PsiClass)
+        e.presentation.isEnabledAndVisible = (psiElement is PsiMethod || psiElement is PsiClass ||
+                psiElement is KtNamedFunction || psiElement is KtClass)
     }
 
     override fun getActionUpdateThread(): ActionUpdateThread {
