@@ -10,10 +10,6 @@ interface TestableMethod {
     fun hasAnnotation(annotationFQN: String): Boolean
     val psiElement: PsiElement
 
-    fun getFullyQualifiedClassName(): String {
-        return containingClassQualifiedName ?: ""
-    }
-
     fun isTestAnnotated(): Boolean {
         return hasAnnotation("org.junit.jupiter.api.Test")
                 || hasAnnotation("org.junit.Test")

@@ -18,16 +18,10 @@ class RunRelatedTestsAction : AnAction() {
         val psiElement = event.getData(CommonDataKeys.PSI_ELEMENT)
 
         when (psiElement) {
-            is PsiMethod -> {
+            is PsiMethod, is KtNamedFunction -> {
                 TestRunnerUtil.runRelatedTests(psiElement)
             }
-            is PsiClass -> {
-                TestRunnerUtil.runTestsForAllMethodsInClass(psiElement)
-            }
-            is KtNamedFunction -> {
-                TestRunnerUtil.runRelatedTests(psiElement)
-            }
-            is KtClass -> {
+            is PsiClass, is KtClass -> {
                 TestRunnerUtil.runTestsForAllMethodsInClass(psiElement)
             }
             else -> {
